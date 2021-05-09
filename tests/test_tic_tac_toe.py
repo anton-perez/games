@@ -19,7 +19,7 @@ print(game.winner)
 
 num_wins = {1: 0, 2: 0, 'Tie':0}
 
-for _ in range(1000):
+for _ in range(200):
   players = [RandomPlayer(), RandomPlayer()]
   game = TicTacToe(players)
   game.run_to_completion()

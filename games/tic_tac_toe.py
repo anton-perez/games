@@ -20,7 +20,7 @@ class TicTacToe:
   
   def determine_player_order(self):
     rand = round(random())
-    if rand == 0:
+    if rand == 1:
       self.players = self.players[::-1]
 
   def get_possible_moves(self):
