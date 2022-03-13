@@ -11,8 +11,8 @@ class TicTacToe:
     self.winner = None
   
   def set_player_symbols(self): 
-    self.players[0].set_player_symbol('X')
-    self.players[1].set_player_symbol('O')
+    self.players[0].set_player_symbol('1')
+    self.players[1].set_player_symbol('2')
 
   def set_player_numbers(self): 
     self.players[0].set_player_number(1)
@@ -22,6 +22,9 @@ class TicTacToe:
     rand = round(random())
     if rand == 1:
       self.players = self.players[::-1]
+    first_symbol = self.players[0].symbol
+    self.players[0].set_first(first_symbol)
+    self.players[1].set_first(first_symbol)
 
   def get_possible_moves(self):
     possible_moves = [(i,j) for i in range(3) for j in range(3) if self.board[i][j] == None]
@@ -30,8 +33,8 @@ class TicTacToe:
   def complete_round(self):
     for player in self.players:
       choices = self.get_possible_moves()
-      if choices != []:
-        player_move = player.choose_move(choices)
+      if choices != [] and self.check_for_winner() == None:
+        player_move = player.choose_move(self.board, choices)
         self.board[player_move[0]][player_move[1]] = player.symbol
     self.round += 1
 
@@ -42,12 +45,12 @@ class TicTacToe:
 
   def check_for_winner(self):
     rows = self.board.copy()
-    cols = [[self.board[j][i] for i in range(3)] for j in range(3)]
+    cols = [[self.board[i][j] for i in range(3)] for j in range(3)]
     diags = [[self.board[i][i] for i in range(3)],
              [self.board[i][2-i] for i in range(3)]]
 
     board_full = True
-    for row in rows + cols + diags:
+    for row in (rows + cols + diags):
       if None in row:
         board_full = False
 
