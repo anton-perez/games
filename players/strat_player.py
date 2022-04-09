@@ -53,8 +53,14 @@ class StratPlayer:
     self.first = first
 
   def state_to_string(self, state):
+    #make so strat always plays as 1
+    #1 is player, 2 is opponent
     state_list = state[0]+state[1]+state[2]
-    str_list = ['0' if i == None else i for i in state_list]
+    if self.number == 1:
+      str_list = ['0' if i == None else i for i in state_list]
+    elif self.number == 2:
+      #changes 1s to 2s and 2s to 1s
+      str_list = ['0' if i == None else str(3-int(i)) for i in state_list]
     return ''.join(str_list)
 
   def string_to_state(self, string):

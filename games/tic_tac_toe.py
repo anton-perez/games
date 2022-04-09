@@ -5,7 +5,7 @@ class TicTacToe:
     self.players = players
     self.set_player_symbols()
     self.set_player_numbers()
-    self.determine_player_order()
+    #self.determine_player_order()
     self.board = [[None for _ in range(3)] for _ in range(3)]
     self.round =  1
     self.winner = None
