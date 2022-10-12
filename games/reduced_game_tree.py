@@ -18,13 +18,16 @@ class Node:
       print(row_string[:-1])
     print('\n')
 
-class GameTree:
-  def __init__(self, first):
+class ReducedGameTree:
+  def __init__(self, player, first):
     self.root = Node([[None for _ in range(3)] for _ in range(3)], first)
     self.first = first
+    self.player = player
     self.node_num = 1
     self.leaf_node_num = 0
+    self.state_dict = {'000000000':self.root}
     self.build_tree(self.root)
+    
 
   def get_open_spaces(self, state):
     open_spaces = [(i,j) for i in range(3) for j in range(3) if state[i][j] == None]
@@ -35,6 +38,11 @@ class GameTree:
       return '2'
     elif symbol == '2':
       return '1'
+
+  def state_to_string(self, state):
+    state_list = state[0]+state[1]+state[2]
+    str_list = ['0' if i == None else i for i in state_list]
+    return ''.join(str_list)
   
   def check_for_winner(self, state):
     rows = state.copy()
@@ -69,15 +77,21 @@ class GameTree:
     for space in self.get_open_spaces(node.state):
       new_state = [[node.state[i][j] for j in range(3)] for i in range(3)]
       new_state[space[0]][space[1]] = node.player
-      new_node = Node(new_state, self.get_opposite_symbol(node.player))
-      new_node.winner = self.check_for_winner(new_state)
-      
-      node.children.append(new_node)
-      self.node_num += 1
-      if new_node.winner == None:
-        self.build_tree(new_node)
+      new_string = self.state_to_string(new_state)
+      if new_string in self.state_dict:
+        existing_node = self.state_dict[new_string]
+        node.children.append(existing_node)
       else:
-        self.leaf_node_num += 1
+        new_node = Node(new_state, self.get_opposite_symbol(node.player))
+        new_node.winner = self.check_for_winner(new_state)
+        
+        node.children.append(new_node)
+        self.state_dict[new_string] = new_node
+        self.node_num += 1
+        if new_node.winner == None:
+          self.build_tree(new_node)
+        else:
+          self.leaf_node_num += 1
 
 
   def set_scores(self, node, player):
@@ -97,5 +111,3 @@ class GameTree:
         node.score = 0
       else:
         node.score = -1
-
-

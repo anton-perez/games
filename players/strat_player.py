@@ -19,10 +19,25 @@ def decimal_to_terniary(n):
 
   return trit_str
 
+def get_lines(state):
+    board = [list(state[i:i+3]) for i in range(0, 9, 3)]
+    rows = [[board[i][j] for j in range(3)] for i in range(3)]
+    cols = [[rows[i][j] for i in range(3)] for j in range(3)]
+    diags = [[rows[i][i] for i in range(3)],
+             [rows[i][2-i] for i in range(3)]]
+
+    return rows + cols + diags
+
+
+
 def possible_state(state_str):
   num_ones = len([i for i in range(9) if state_str[i] == '1'])
   num_twos = len([i for i in range(9) if state_str[i] == '2'])
+  lines = get_lines(state_str)
+  if (['1','1','1'] in lines) or (['2','2','2'] in lines):
+    return False
   return True if abs(num_ones - num_twos) < 2 and num_ones + num_twos != 9 else False
+
 
 def generate_random_strat():
   strat = {}
@@ -34,7 +49,6 @@ def generate_random_strat():
       random_idx = math.floor(len(possible_moves) * random())
       strat[state_str] = possible_moves[random_idx]
   return strat
-
 
 class StratPlayer:
   def __init__(self, strat):

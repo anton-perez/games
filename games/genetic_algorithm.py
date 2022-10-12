@@ -1,6 +1,6 @@
 import math
 import random
-from random import shuffle
+from random import shuffle, sample
 import matplotlib.pyplot as plt
 import sys
 sys.path.append('games')
@@ -64,6 +64,7 @@ class GeneticAlgorithm():
   def __init__(self, population_size, mutation_rate):
     self.strats = [generate_random_strat() for _ in range(population_size)]
     self.population = population_size
+    self.mutation_rate = mutation_rate
     # self.players = [StratPlayer(strat) for strat in initial_strats]
     # self.top_strats = []
     # self.scores = [0 for _ in range(len(initial_strats))]
@@ -118,8 +119,13 @@ class GeneticAlgorithm():
   def breed_strats(self, parent_strats):
     child_strat = {}
     for state in parent_strats[0]:
-      r = round(random())
-      child_strat[state] = parent_strats[r][state]
+      r = random()
+      if r < (1+self.mutation_rate)/2 and r > (1-self.mutation_rate)/2:
+        possible_moves = [i for i in range(9) if state[i] == '0']
+        random_idx = math.floor(len(possible_moves) * random())
+        child_strat[state] = possible_moves[random_idx]
+      else:
+        child_strat[state] = parent_strats[round(r)][state]
     return child_strat
   
   def generate_new_generation(self, init_strats, fitness_score = 'Round Robin',selection_method = 'Hard Cut Off'):
@@ -187,11 +193,17 @@ class GeneticAlgorithm():
     print(top_idxs)
     top_strats = [init_strats[i] for s,i in top_idxs]
     new_strats = top_strats.copy()
-    for i in range(len(top_strats)):
-      for j in range(len(top_strats)):
-        if i!=j:
-          child_strat = self.breed_strats([top_strats[i],top_strats[j]])
-          new_strats.append(child_strat)
+
+    while len(new_strats) < self.population:
+      parents = sample(top_strats, 2)
+      child_strat = self.breed_strats(parents)
+      new_strats.append(child_strat)
+    #       new_strats.append(child_strat)
+    # for i in range(len(top_strats)):
+    #   for j in range(len(top_strats)):
+    #     if i!=j:
+    #       child_strat = self.breed_strats([top_strats[i],top_strats[j]])
+    #       new_strats.append(child_strat)
 
     return new_strats
 

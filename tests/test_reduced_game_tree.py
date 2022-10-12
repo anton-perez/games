@@ -1,8 +1,8 @@
 import sys
 sys.path.append('games')
-from game_tree import *
+from reduced_game_tree import *
 
-tree = GameTree('1')
+tree = ReducedGameTree('1')
 
 print('Building game tree...')
 #tree.build_tree(tree.root)
@@ -20,7 +20,3 @@ node.print_state()
 node = tree.get_node([['1','2',None], ['2','1',None],[None,None,None]])
 print(node.score)
 node.print_state()
-# for child in tree.root.children:
-#   print(child.score)
-#   child.print_state()
-
