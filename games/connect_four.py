@@ -8,7 +8,7 @@ class ConnectFour:
     self.logs.clear_log()
     self.set_player_symbols()
     self.set_player_numbers()
-    self.determine_player_order()
+    #self.determine_player_order()
     self.board = [[None for _ in range(6)] for _ in range(7)] #transpose; columns are lists
     self.round =  1
     self.winner = None
@@ -22,13 +22,13 @@ class ConnectFour:
     self.players[0].set_player_number(1)
     self.players[1].set_player_number(2)
   
-  def determine_player_order(self):
-    # rand = round(random())
-    # if rand == 1:
-    #   self.players = self.players[::-1]
-    first_symbol = self.players[0].symbol
-    self.players[0].set_first(first_symbol)
-    self.players[1].set_first(first_symbol)
+  # def determine_player_order(self):
+  #   # rand = round(random())
+  #   # if rand == 1:
+  #   #   self.players = self.players[::-1]
+  #   first_symbol = self.players[0].symbol
+  #   self.players[0].set_first(first_symbol)
+  #   self.players[1].set_first(first_symbol)
 
   def get_possible_moves(self):
     possible_moves = [i for i in range(7) if None in self.board[i]]

@@ -17,12 +17,14 @@ class HeuristicPlayer:
   
   def set_player_number(self, n):
     self.number = n
-
-  def set_first(self, first):
-    self.first = first
+  # def set_first(self, first):
+    self.first = '1'
     self.game_tree = HeuristicGameTree(self.number, self.first, self.search_depth)
     self.game_tree.set_scores(self.game_tree.root, self.symbol)
 
+  def transpose(self, state):
+    return [[state[i][j] for i in range(len(state))] for j in range(len(state[0]))]
+  
   def choose_move(self, state, choices):
     state_string = self.game_tree.state_to_string(state)
     if state_string not in self.game_tree.state_dict.keys():
