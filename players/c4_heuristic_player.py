@@ -26,9 +26,11 @@ class HeuristicPlayer:
     return [[state[i][j] for i in range(len(state))] for j in range(len(state[0]))]
   
   def choose_move(self, state, choices):
-    state_string = self.game_tree.state_to_string(state)
+    col_state = state
+    #col_state = self.transpose(state)
+    state_string = self.game_tree.state_to_string(col_state)
     if state_string not in self.game_tree.state_dict.keys():
-      self.game_tree.state_dict[state_string] = Node(state, self.symbol)
+      self.game_tree.state_dict[state_string] = Node(col_state, self.symbol)
     state_node = self.game_tree.state_dict[state_string]
     if state_node.children == []:
       self.game_tree.build_part_of_tree(state_node)
@@ -39,7 +41,7 @@ class HeuristicPlayer:
     #random_index = random.choice(max_indices)
     chosen_state = state_node.children[max_indices[0]].state
     for choice in choices:
-      choice_state = [[state[i][j] for j in range(6)] for i in range(7)]
+      choice_state = [[col_state[i][j] for j in range(6)] for i in range(7)]
       i = 0
       while i+1 < 6 and choice_state[choice][i+1]==None:
         i+=1
