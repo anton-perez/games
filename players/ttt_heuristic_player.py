@@ -1,7 +1,7 @@
 import random
 import math
 import sys
-sys.path.append('games')
+sys.path.append('trees')
 from ttt_heuristic_game_tree import *
 
 class HeuristicPlayer:

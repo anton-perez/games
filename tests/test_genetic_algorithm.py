@@ -2,6 +2,7 @@ import math, random
 import sys
 sys.path.append('games')
 from tic_tac_toe import *
+sys.path.append('algorithms')
 from genetic_algorithm import *
 sys.path.append('players')
 from strat_player import *

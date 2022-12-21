@@ -1,5 +1,5 @@
 import sys
-sys.path.append('games')
+sys.path.append('trees')
 from game_tree import *
 
 tree = GameTree('1')

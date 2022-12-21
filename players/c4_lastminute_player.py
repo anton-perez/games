@@ -1,87 +1,151 @@
 from random import random
 import math
+import random, math
 
-class LastminutePlayer:
-  def __init__(self):
-    self.symbol = None
-    self.number = None
-    self.first = None
-  
-  def set_player_symbol(self, n):
-    self.symbol = n
-  
-  def set_player_number(self, n):
-    self.number = n
-  
-  def set_first(self, first):
-    self.first = first
-
-  def transpose_board(self, state):
-    return [[state[i][j] for i in range(7)] for j in range(6)] 
+class LastMinutePlayer():
+    def __init__(self):
+        self.number = None
+        self.symbol = None
     
-  def get_diagonals(self, state, row_index):
-    forward_diag = []
-    back_diag = []
+    def set_player_number(self, number):
+        self.number = number
+   
+    def set_player_symbol(self, symbol):
+        self.symbol = symbol
     
-    forward_coord = [row_index, 3]
-    back_coord = [row_index, 3]
-    while back_coord[0] >= 0 and back_coord[1] >= 0:
-      forward_diag.append(state[forward_coord[1]][forward_coord[0]])
-      back_diag.append(state[back_coord[1]][back_coord[0]])
-      forward_coord[0]-=1
-      back_coord[0]-=1
-      forward_coord[1]+=1
-      back_coord[1]-=1
-
-    forward_coord = [row_index+1, 2]
-    back_coord = [row_index+1, 4]
-    while back_coord[0] <= 5 and back_coord[1] <= 6:
-      forward_diag.insert(0,state[forward_coord[1]][forward_coord[0]])
-      back_diag.insert(0,state[back_coord[1]][back_coord[0]])
-      forward_coord[0]+=1
-      back_coord[0]+=1
-      forward_coord[1]-=1
-      back_coord[1]+=1
-      
-    return [forward_diag, back_diag]
-  
-  def get_all_diagonals(self, state):
-    all_diags = []
-    for i in range(6):
-      all_diags += self.get_diagonals(state, i)
-    return all_diags
-  
-  def four_in_a_row(self, player, line):
-    four_str = ''.join([player for _ in range(4)])
-    line_str = ''.join([val if val != None else '0' for val in line])
-
-    return four_str in line_str
-  
-  def check_for_winner(self, state):
-    cols = state.copy()
-    rows = self.transpose_board(state)
-    diags = self.get_all_diagonals(state)
-
-    board_full = True
-    for line in (rows + cols + diags):
-      if None in line:
-        board_full = False
-
-      for player in ['1','2']:
-        if self.four_in_a_row(player, line):
-          return player
+    def transpose(self, board):
+        t_board = []
+        for i in range(len(board[0])):
+            t_row = []
+            for arr in board:
+                t_row.append(arr[i])
+            t_board.append(t_row)
+        return t_board
     
-    if board_full:
-      return 'Tie'
-    return None
-  
-  def choose_move(self, state, choices):
-    cols = state.copy()
-    rows = self.transpose_board(state)
-    diags = self.get_all_diagonals(state)
-    lines = cols + rows + diags
-    for line in lines:
-      #something
+    def arr_add(self, arr_1, arr_2):
+        assert len(arr_1) == len(arr_2), 'different len arrays'
+        result = []
+        for i in range(len(arr_1)):
+            result.append(arr_1[i] + arr_2[i])
+        return result
     
-    random_idx = math.floor(len(choices) * random())
-    return choices[random_idx]
+    def coords_to_elem(self, coords, board):
+        if type(coords)!=list:
+            coords = [coords]
+        elems = []
+        for coord in coords:
+            elems.append(board[coord[0]][coord[1]])
+        return elems
+    
+    def get_diags(self, board):
+        coords = [[0,i] for i in range(7)]+[[5,2],[5,3],[5,4]]
+        diags = []
+        for coord in coords:
+            coord_diags = []
+            dummy = list(coord)
+            options = [[1,1], [1,-1],[-1,1],[-1,-1]]
+            for option in options:
+                diag = []
+                while dummy[0]>=0 and dummy[0]<6 and dummy[1]>=0 and dummy[1]<7:
+                    diag.append(dummy)
+                    dummy = self.arr_add(dummy, option)
+                if len(diag) > 3:
+                    coord_diags.append(diag)
+                dummy = list(coord)
+            dummy = list(coord)
+            diags += coord_diags
+        
+        diag_elems = []
+        for diag in diags:
+            diag_elems.append(self.coords_to_elem(diag, board))
+        
+        return [diag_elems, diags]
+    
+    def three_in_four(self, arr): # ex. 0 1 1 0 1 0 -> 1
+        for i,val in enumerate(arr[:-3]):
+            len_four = arr[i:i+4]
+            if len_four.count(1)==3 and 0 in len_four:
+                return (1, i+len_four.index(0))
+            elif len_four.count(2)==3 and 0 in len_four:
+                return (2, i+len_four.index(0))
+    
+    def open_ended_three(self, arr):
+        for i,val in enumerate(arr[:-4]):
+            len_five = arr[i:i+5]
+            if len_five[1]==0:
+                continue
+            if len(set(len_five[1:-1]))==1 and len_five.count(0)==2:
+                return (len_five[1],[i,i+4])
+
+    def transform_board(self, board):
+      return [[int(row[i]) if row[i] != None else 0 for i in range(len(row))] for row in board]
+  
+    def choose_move(self, board, choices):
+        # for anton's game
+        board = self.transpose(board)
+        board = self.transform_board(board)
+        rows = board
+        cols = self.transpose(board)
+        diags = self.get_diags(board)
+        diag_elems = diags[0]
+        diag_coords = diags[1]
+        loss_prevent = None
+
+        for i,row in enumerate(rows):
+            potential = self.three_in_four(row)
+            open_three = self.open_ended_three(row)
+            if potential != None:
+                target_coord = (i,potential[1])
+                if i == 5 or board[i+1][potential[1]] != 0:
+                    if potential[0] != self.number:
+                        loss_prevent = potential[1]
+                    else:
+                        return potential[1]
+            if open_three != None:
+                col_idxs = open_three[1]
+                target_coords = [(i,col_idx) for col_idx in col_idxs]
+                if i == 5 and open_three[0] == self.number:
+                    return open_three[1][0]
+                elif i == 5 and open_three[0] == 3-self.number:
+                    continue
+                for coord in target_coords:
+                    if board[coord[0]+1][coord[1]] != 0:
+                        if open_three[0] == self.number:
+                            return coord[1]
+        
+        for i,col in enumerate(cols):
+            potential = self.three_in_four(col)
+            if potential != None:
+                if potential[0] != self.number:
+                    loss_prevent = i
+                else:
+                    return i
+        
+        for i,diag in enumerate(diag_elems):
+            potential = self.three_in_four(diag)
+            open_three = self.open_ended_three(diag)
+            if potential != None:
+                coord = diag_coords[i][potential[1]]
+
+                if coord[0] == 5 or board[coord[0]+1][coord[1]] != 0:
+                    if potential != self.number:
+                        loss_prevent = coord[1]
+                    else:
+                        return coord[1]
+            if open_three != None:
+                coords = [diag_coords[i][col_idx] for col_idx in open_three[1]]
+                for coord in coords:
+                    if coord[0] == 5 and open_three[0] == self.number:
+                        return coord[1]
+                    elif coord[0] == 5 and open_three[0] != self.number:
+                        loss_prevent = coord[1]
+                    elif board[coord[0]+1][coord[1]] != 0:
+                        if open_three[0] == self.number:
+                            return coord[1]
+
+        if loss_prevent == None:
+            return random.choice(choices)
+        return loss_prevent
+
+    def report_winner(self, winner, board):
+        pass

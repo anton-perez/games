@@ -1,7 +1,7 @@
 import random
 import math
 import sys
-sys.path.append('games')
+sys.path.append('trees')
 from reduced_game_tree import *
 
 class MinimaxPlayer:
